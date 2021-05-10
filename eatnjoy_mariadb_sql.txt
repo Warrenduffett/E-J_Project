@@ -1,0 +1,115 @@
+CREATE TABLE `tbl_member` (
+	`uId` VARCHAR(50) NOT NULL COLLATE 'utf8_general_ci',
+	`uPwd` VARCHAR(50) NOT NULL COLLATE 'utf8_general_ci',
+	`uName` VARCHAR(30) NOT NULL COLLATE 'utf8_general_ci',
+	`uPhon` VARCHAR(20) NOT NULL COLLATE 'utf8_general_ci',
+	`uZip` INT(8) NULL DEFAULT NULL,
+	`uAddr` VARCHAR(30) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`uBirth` DATE NULL DEFAULT NULL,
+	`regDate` DATE NOT NULL DEFAULT current_timestamp(),
+	`verified ` CHAR(1) NOT NULL DEFAULT '0' COLLATE 'utf8_general_ci',
+	PRIMARY KEY (`uId`) USING BTREE
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `tbl_product` (
+	`pId` INT(4) NOT NULL,
+	`pName` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'utf8_general_ci',
+	`cateCode` INT(2) NOT NULL,
+	`pPrice` INT(100) NOT NULL,
+	`pStock` INT(3) NOT NULL,
+	`pDes` VARCHAR(500) NOT NULL COLLATE 'utf8_general_ci',
+	`pImg1` VARCHAR(50) NOT NULL COLLATE 'utf8_general_ci',
+	`pImg2` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`pImg3` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`pRegDate` DATE NOT NULL DEFAULT current_timestamp(),
+	`pHit` INT(100) NOT NULL,
+	`pSold` INT(5) NOT NULL,
+	PRIMARY KEY (`pId`) USING BTREE
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `tbl_order` (
+	`oId` INT(10) NOT NULL DEFAULT '0',
+	`uId` VARCHAR(50) NOT NULL COLLATE 'utf8_general_ci',
+	`oDate` DATE NOT NULL DEFAULT current_timestamp(),
+	`oTotalPrice` INT(12) NOT NULL,
+	`oState` INT(1) NOT NULL,
+	PRIMARY KEY (`oId`) USING BTREE,
+	INDEX `FK_tbl_order_tbl_member` (`uId`) USING BTREE,
+	CONSTRAINT `FK_tbl_order_tbl_member` FOREIGN KEY (`uId`) REFERENCES `db`.`tbl_member` (`uId`) ON UPDATE RESTRICT ON DELETE RESTRICT
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `tbl_orderdetail` (
+	`odId` INT(10) NOT NULL,
+	`oId` INT(10) NOT NULL,
+	`pId` INT(4) NOT NULL,
+	`odQTY` INT(3) NULL DEFAULT NULL,
+	PRIMARY KEY (`odId`) USING BTREE,
+	INDEX `FK_tbl_orderdetail_tbl_order` (`oId`) USING BTREE,
+	INDEX `FK_tbl_orderdetail_tbl_product` (`pId`) USING BTREE,
+	CONSTRAINT `FK_tbl_orderdetail_tbl_order` FOREIGN KEY (`oId`) REFERENCES `db`.`tbl_order` (`oId`) ON UPDATE RESTRICT ON DELETE RESTRICT,
+	CONSTRAINT `FK_tbl_orderdetail_tbl_product` FOREIGN KEY (`pId`) REFERENCES `db`.`tbl_product` (`pId`) ON UPDATE RESTRICT ON DELETE RESTRICT
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `tbl_cart` (
+	`cId` INT(10) NOT NULL,
+	`uId` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'utf8_general_ci',
+	`pId` INT(4) NOT NULL,
+	`cQTY` INT(3) NULL DEFAULT NULL,
+	PRIMARY KEY (`cId`) USING BTREE,
+	INDEX `FK_tbl_cart_tbl_member` (`uId`) USING BTREE,
+	INDEX `FK_tbl_cart_tbl_product` (`pId`) USING BTREE,
+	CONSTRAINT `FK_tbl_cart_tbl_member` FOREIGN KEY (`uId`) REFERENCES `db`.`tbl_member` (`uId`) ON UPDATE RESTRICT ON DELETE RESTRICT,
+	CONSTRAINT `FK_tbl_cart_tbl_product` FOREIGN KEY (`pId`) REFERENCES `db`.`tbl_product` (`pId`) ON UPDATE RESTRICT ON DELETE RESTRICT
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `tbl_notice` (
+	`nId` INT(4) NOT NULL,
+	`nWriter` VARCHAR(50) NOT NULL COLLATE 'utf8_general_ci',
+	`nTitle` VARCHAR(100) NOT NULL COLLATE 'utf8_general_ci',
+	`nContent` VARCHAR(400) NOT NULL COLLATE 'utf8_general_ci',
+	`nFile` VARCHAR(4000) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`nRegDate` DATE NULL DEFAULT current_timestamp(),
+	`nHit` INT(4) NULL DEFAULT NULL,
+	PRIMARY KEY (`nId`) USING BTREE
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
+CREATE TABLE `tbl_review` (
+	`rId` INT(10) NOT NULL,
+	`oId` INT(10) NOT NULL,
+	`pId` INT(4) NOT NULL,
+	`rWriter` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'utf8_general_ci',
+	`rTitle` VARCHAR(100) NOT NULL DEFAULT '' COLLATE 'utf8_general_ci',
+	`rContent` VARCHAR(200) NOT NULL DEFAULT '' COLLATE 'utf8_general_ci',
+	`rPhoto1` VARCHAR(400) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`rPhoto2` VARCHAR(400) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`rPhoto3` VARCHAR(400) NULL DEFAULT NULL COLLATE 'utf8_general_ci',
+	`rRegDate` DATE NULL DEFAULT current_timestamp(),
+	`rHit` INT(4) NULL DEFAULT '0',
+	PRIMARY KEY (`rId`) USING BTREE,
+	INDEX `FK_tbl_review_tbl_order` (`oId`) USING BTREE,
+	INDEX `FK_tbl_review_tbl_product` (`pId`) USING BTREE,
+	CONSTRAINT `FK_tbl_review_tbl_order` FOREIGN KEY (`oId`) REFERENCES `db`.`tbl_order` (`oId`) ON UPDATE RESTRICT ON DELETE RESTRICT,
+	CONSTRAINT `FK_tbl_review_tbl_product` FOREIGN KEY (`pId`) REFERENCES `db`.`tbl_product` (`pId`) ON UPDATE RESTRICT ON DELETE RESTRICT
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+;
+
